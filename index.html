@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -608,6 +611,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .animate-in {
             animation: fadeIn 0.3s ease-out;
         }
@@ -766,6 +773,10 @@
             <div class="nav-item" data-section="library" onclick="showSection('library')">
                 <i class="fas fa-book"></i>
                 Biblioteca
+            </div>
+            <div class="nav-item" data-section="import" onclick="showSection('import')">
+                <i class="fas fa-camera"></i>
+                Importar Ticket/PDF
             </div>
             <div class="nav-item" onclick="exportData()">
                 <i class="fas fa-download"></i>
@@ -1177,6 +1188,93 @@
                     <i class="fas fa-book-open"></i>
                     <h4>Tu biblioteca está vacía</h4>
                     <p>Guarda gastos que repites para añadirlos con un solo clic</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Import Section -->
+        <section class="section" id="import">
+            <div class="header">
+                <div>
+                    <h2>Importar Ticket / PDF</h2>
+                    <p style="color: var(--text-light); margin-top: 4px;">Sube un PDF bancario o foto de un ticket y lo leemos automáticamente</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <!-- PDF Upload -->
+                    <div style="flex: 1; min-width: 250px; border: 2px dashed var(--border); border-radius: 16px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s;" 
+                         onclick="document.getElementById('pdfInput').click()"
+                         onmouseover="this.style.borderColor='var(--primary)'" 
+                         onmouseout="this.style.borderColor='var(--border)'">
+                        <i class="fas fa-file-pdf" style="font-size: 48px; color: #ef4444; margin-bottom: 12px;"></i>
+                        <h3 style="margin-bottom: 8px;">PDF del Banco</h3>
+                        <p style="font-size: 13px; color: var(--text-light);">Sube el extracto bancario en PDF</p>
+                        <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="handlePDF(event)">
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div style="flex: 1; min-width: 250px; border: 2px dashed var(--border); border-radius: 16px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s;" 
+                         onclick="document.getElementById('imageInput').click()"
+                         onmouseover="this.style.borderColor='var(--primary)'" 
+                         onmouseout="this.style.borderColor='var(--border)'">
+                        <i class="fas fa-camera" style="font-size: 48px; color: var(--primary); margin-bottom: 12px;"></i>
+                        <h3 style="margin-bottom: 8px;">Foto del Ticket</h3>
+                        <p style="font-size: 13px; color: var(--text-light);">Fotografía o imagen del recibo</p>
+                        <input type="file" id="imageInput" accept="image/*" capture="environment" style="display:none" onchange="handleImage(event)">
+                    </div>
+                </div>
+
+                <!-- Processing Status -->
+                <div id="importStatus" style="display: none; text-align: center; padding: 32px;">
+                    <div class="spinner" style="display: inline-block; width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                    <p id="importStatusText" style="margin-top: 16px; font-weight: 500;">Procesando...</p>
+                    <div id="importProgress" style="margin-top: 12px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; max-width: 300px; margin-left: auto; margin-right: auto;">
+                        <div id="importProgressBar" style="height: 100%; background: var(--primary); border-radius: 3px; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+
+                <!-- Preview Image -->
+                <div id="imagePreview" style="display: none; text-align: center; margin-bottom: 20px;">
+                    <img id="previewImg" style="max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: var(--shadow);">
+                </div>
+
+                <!-- Extracted Text Preview -->
+                <div id="extractedTextPreview" style="display: none; margin-bottom: 20px;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-alt"></i> Texto extraído</h3>
+                        <button class="btn btn-outline btn-sm" onclick="toggleExtractedText()">
+                            <i class="fas fa-eye"></i> Mostrar/Ocultar
+                        </button>
+                    </div>
+                    <pre id="extractedText" style="background: var(--bg); padding: 16px; border-radius: 12px; font-size: 12px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; display: none;"></pre>
+                </div>
+
+                <!-- Extracted Transactions Table -->
+                <div id="extractedTransactions" style="display: none;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list-check"></i> Transacciones detectadas</h3>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-success btn-sm" onclick="importAllExtracted()">
+                                <i class="fas fa-check-double"></i> Importar todas
+                            </button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Monto</th>
+                                <th>Tipo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="extractedTableBody">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -2101,6 +2199,418 @@
                     </button>
                 `;
             }).join('');
+        }
+
+        // ========== IMPORT FROM PDF / IMAGE ==========
+        let extractedItems = [];
+
+        function showImportStatus(text, progress) {
+            document.getElementById('importStatus').style.display = 'block';
+            document.getElementById('importStatusText').textContent = text;
+            if (progress !== undefined) {
+                document.getElementById('importProgressBar').style.width = progress + '%';
+            }
+        }
+
+        function hideImportStatus() {
+            document.getElementById('importStatus').style.display = 'none';
+            document.getElementById('importProgressBar').style.width = '0%';
+        }
+
+        function toggleExtractedText() {
+            const el = document.getElementById('extractedText');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // ========== PDF HANDLING ==========
+        async function handlePDF(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Reset UI
+            resetImportUI();
+            showImportStatus('Leyendo PDF...', 10);
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                showImportStatus('Extrayendo texto del PDF...', 30);
+                
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    showImportStatus(`Procesando página ${i}/${pdf.numPages}...`, 30 + (i / pdf.numPages) * 40);
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n';
+                }
+
+                showImportStatus('Analizando transacciones...', 80);
+                document.getElementById('extractedText').textContent = fullText;
+                document.getElementById('extractedTextPreview').style.display = 'block';
+
+                extractedItems = parseTransactionsFromText(fullText);
+                showExtractedTransactions();
+                hideImportStatus();
+
+                if (extractedItems.length === 0) {
+                    showToast('No se detectaron transacciones. Revisa el texto extraído.', 'error');
+                } else {
+                    showToast(`${extractedItems.length} transacciones detectadas`, 'success');
+                }
+            } catch (err) {
+                hideImportStatus();
+                showToast('Error al leer el PDF: ' + err.message, 'error');
+            }
+
+            event.target.value = '';
+        }
+
+        // ========== IMAGE / OCR HANDLING ==========
+        async function handleImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            resetImportUI();
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            showImportStatus('Iniciando OCR (puede tardar 10-30s)...', 5);
+
+            try {
+                const result = await Tesseract.recognize(file, 'spa', {
+                    logger: (m) => {
+                        if (m.status === 'recognizing text') {
+                            const pct = Math.round(m.progress * 100);
+                            showImportStatus(`Leyendo texto... ${pct}%`, 10 + pct * 0.8);
+                        }
+                    }
+                });
+
+                const text = result.data.text;
+                showImportStatus('Analizando transacciones...', 95);
+                
+                document.getElementById('extractedText').textContent = text;
+                document.getElementById('extractedTextPreview').style.display = 'block';
+
+                extractedItems = parseTransactionsFromText(text);
+                showExtractedTransactions();
+                hideImportStatus();
+
+                if (extractedItems.length === 0) {
+                    showToast('No se detectaron transacciones claras. Revisa el texto extraído.', 'error');
+                } else {
+                    showToast(`${extractedItems.length} transacciones detectadas`, 'success');
+                }
+            } catch (err) {
+                hideImportStatus();
+                showToast('Error en OCR: ' + err.message, 'error');
+            }
+
+            event.target.value = '';
+        }
+
+        // ========== TEXT PARSING ==========
+        function parseTransactionsFromText(text) {
+            const items = [];
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+            // Patterns for Spanish bank statements and receipts
+            // Date patterns: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY, DD MMM
+            const datePattern = /(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/;
+            const dateShortPattern = /(\d{1,2})\s+(?:ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)/i;
+            
+            // Amount patterns: 1.234,56 or 1234.56 or 1234,56 or -1.234,56
+            const amountPattern = /(-?\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2}))/;
+
+            // Common bank statement format: DATE DESCRIPTION AMOUNT
+            const bankLinePattern = /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]?\d{0,4})\s+(.+?)\s+(-?\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*$/;
+            
+            // Receipt pattern: PRODUCT NAME    AMOUNT
+            const receiptLinePattern = /^(.+?)\s{2,}(-?\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*$/;
+
+            // Try to find a date context
+            let lastDate = null;
+            const monthMap = {
+                'ene': '01', 'feb': '02', 'mar': '03', 'abr': '04', 'may': '05', 'jun': '06',
+                'jul': '07', 'ago': '08', 'sep': '09', 'oct': '10', 'nov': '11', 'dic': '12'
+            };
+
+            for (const line of lines) {
+                // Try bank statement format first
+                let match = line.match(bankLinePattern);
+                if (match) {
+                    const dateStr = normalizeDate(match[1]);
+                    const desc = match[2].trim();
+                    const amount = parseSpanishAmount(match[3]);
+                    
+                    if (amount !== 0 && desc.length > 2) {
+                        items.push({
+                            date: dateStr || new Date().toISOString().slice(0, 10),
+                            description: desc.substring(0, 100),
+                            amount: Math.abs(amount),
+                            type: amount < 0 ? 'expense' : 'income',
+                            category: guessCategory(desc)
+                        });
+                        if (dateStr) lastDate = dateStr;
+                    }
+                    continue;
+                }
+
+                // Try receipt format
+                match = line.match(receiptLinePattern);
+                if (match) {
+                    const desc = match[1].trim();
+                    const amount = parseSpanishAmount(match[2]);
+                    
+                    // Skip lines that look like headers, totals, etc.
+                    if (desc.length < 3 || /total|subtotal|iva|iva|cambio|efectivo|tarjeta/i.test(desc)) continue;
+                    
+                    if (amount !== 0) {
+                        items.push({
+                            date: lastDate || new Date().toISOString().slice(0, 10),
+                            description: desc.substring(0, 100),
+                            amount: Math.abs(amount),
+                            type: amount < 0 ? 'expense' : 'income',
+                            category: guessCategory(desc)
+                        });
+                    }
+                    continue;
+                }
+
+                // Check for standalone date to update context
+                const dateMatch = line.match(datePattern);
+                if (dateMatch) {
+                    lastDate = normalizeDate(dateMatch[0]);
+                }
+
+                // Check for lines with amount anywhere (fallback)
+                const amtMatch = line.match(/(-?\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*(?:€|EUR)?\s*$/);
+                if (amtMatch) {
+                    const amount = parseSpanishAmount(amtMatch[1]);
+                    // Get the description (everything before the amount)
+                    const desc = line.replace(amtMatch[0], '').trim();
+                    
+                    if (amount !== 0 && desc.length > 3 && !/total|subtotal|iva|cambio/i.test(desc)) {
+                        items.push({
+                            date: lastDate || new Date().toISOString().slice(0, 10),
+                            description: desc.substring(0, 100),
+                            amount: Math.abs(amount),
+                            type: amount < 0 ? 'expense' : 'income',
+                            category: guessCategory(desc)
+                        });
+                    }
+                }
+            }
+
+            // Deduplicate
+            const unique = [];
+            const seen = new Set();
+            for (const item of items) {
+                const key = `${item.date}_${item.amount}_${item.description.substring(0, 20)}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(item);
+                }
+            }
+
+            return unique;
+        }
+
+        function parseSpanishAmount(str) {
+            if (!str) return 0;
+            str = str.trim().replace(/\s/g, '').replace('€', '').replace('EUR', '');
+            
+            // Handle negative
+            let negative = false;
+            if (str.startsWith('-') || str.startsWith('(')) {
+                negative = true;
+                str = str.replace(/^[-(]+/, '').replace(/\)$/, '');
+            }
+
+            // Spanish format: 1.234,56 -> 1234.56
+            // Check if last separator is comma (Spanish) or dot (English)
+            const lastComma = str.lastIndexOf(',');
+            const lastDot = str.lastIndexOf('.');
+
+            if (lastComma > lastDot) {
+                // Spanish format: dots are thousands, comma is decimal
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (lastDot > lastComma) {
+                // English format: commas are thousands, dot is decimal
+                str = str.replace(/,/g, '');
+            } else {
+                // No separator or only one type
+                str = str.replace(/,/g, '.');
+            }
+
+            let num = parseFloat(str);
+            if (isNaN(num)) return 0;
+            return negative ? -num : num;
+        }
+
+        function normalizeDate(str) {
+            if (!str) return null;
+            
+            const monthMap = {
+                'ene': '01', 'feb': '02', 'mar': '03', 'abr': '04', 'may': '05', 'jun': '06',
+                'jul': '07', 'ago': '08', 'sep': '09', 'oct': '10', 'nov': '11', 'dic': '12'
+            };
+
+            // DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+            let match = str.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+            if (match) {
+                let day = match[1].padStart(2, '0');
+                let month = match[2].padStart(2, '0');
+                let year = match[3];
+                if (year.length === 2) year = '20' + year;
+                return `${year}-${month}-${day}`;
+            }
+
+            // DD MMM format (e.g., "15 Ene")
+            match = str.match(/(\d{1,2})\s+(ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)/i);
+            if (match) {
+                const day = match[1].padStart(2, '0');
+                const month = monthMap[match[2].toLowerCase()];
+                const year = new Date().getFullYear();
+                return `${year}-${month}-${day}`;
+            }
+
+            // DD/MM (no year)
+            match = str.match(/(\d{1,2})[\/\-](\d{1,2})$/);
+            if (match) {
+                const day = match[1].padStart(2, '0');
+                const month = match[2].padStart(2, '0');
+                const year = new Date().getFullYear();
+                return `${year}-${month}-${day}`;
+            }
+
+            return null;
+        }
+
+        function guessCategory(description) {
+            const desc = description.toLowerCase();
+            
+            const rules = [
+                { patterns: ['mercadona', 'carrefour', 'lidl', 'aldi', 'eroski', 'dia ', 'consum', 'alcampo', 'supermercado', 'alimentacion'], category: 'alimentacion' },
+                { patterns: ['gasolina', 'gasolinera', 'repsol', 'cepsa', 'bp ', 'parking', 'peaje', 'metro', 'autobus', 'renfe', 'cercanias', 'uber', 'cabify', 'taxi'], category: 'transporte' },
+                { patterns: ['alquiler', 'hipoteca', 'comunidad', 'ibi', 'seguro hogar'], category: 'vivienda' },
+                { patterns: ['luz', 'endesa', 'iberdrola', 'gas', 'agua', 'internet', 'movistar', 'vodafone', 'orange', 'telefono', 'fibra'], category: 'servicios' },
+                { patterns: ['farmacia', 'hospital', 'clinica', 'medico', 'dentista', 'salud', 'mutua', 'seguro medico'], category: 'salud' },
+                { patterns: ['restaurante', 'bar ', 'cafeteria', 'mcdonald', 'burger', 'pizza', 'sushi', 'dominos', 'telepizza'], category: 'restaurantes' },
+                { patterns: ['netflix', 'spotify', 'amazon prime', 'disney', 'hbo', 'youtube', 'suscripcion', 'apple'], category: 'suscripciones' },
+                { patterns: ['zara', 'h&m', 'primark', 'mango', 'pull&bear', 'ropa', 'calzado', 'nike', 'adidas'], category: 'ropa' },
+                { patterns: ['cine', 'teatro', 'concierto', 'spotify', 'juego', 'playstation', 'xbox', 'steam', 'ocio'], category: 'entretenimiento' },
+                { patterns: ['veterinario', 'comida perro', 'comida gato', 'mascota', 'animal'], category: 'mascotas' },
+                { patterns: ['ikea', 'leroy', 'bricomart', 'ferreteria', 'muebles', 'decoracion'], category: 'hogar' },
+                { patterns: ['colegio', 'universidad', 'master', 'curso', 'libro', 'udemy', 'formacion'], category: 'educacion' },
+                { patterns: ['nómina', 'nomina', 'salario', 'sueldo', 'paga'], category: 'salario' },
+            ];
+
+            for (const rule of rules) {
+                for (const pattern of rule.patterns) {
+                    if (desc.includes(pattern)) {
+                        return rule.category;
+                    }
+                }
+            }
+
+            return 'otros_gastos';
+        }
+
+        function showExtractedTransactions() {
+            const tbody = document.getElementById('extractedTableBody');
+            const container = document.getElementById('extractedTransactions');
+
+            if (extractedItems.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+
+            tbody.innerHTML = extractedItems.map((item, index) => {
+                const cat = getCategoryInfo(item.category);
+                return `
+                    <tr>
+                        <td><input type="date" value="${item.date}" onchange="extractedItems[${index}].date = this.value" style="border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 12px;"></td>
+                        <td><input type="text" value="${escapeHtml(item.description)}" onchange="extractedItems[${index}].description = this.value" style="border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 12px; width: 100%;"></td>
+                        <td>
+                            <select onchange="extractedItems[${index}].category = this.value" style="border: 1px solid var(--border); border-radius: 6px; padding: 4px; font-size: 12px;">
+                                ${[...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES].map(c =>
+                                    `<option value="${c.id}" ${c.id === item.category ? 'selected' : ''}>${c.icon} ${c.name}</option>`
+                                ).join('')}
+                            </select>
+                        </td>
+                        <td><input type="number" value="${item.amount}" step="0.01" min="0" onchange="extractedItems[${index}].amount = parseFloat(this.value)" style="border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 12px; width: 90px;"></td>
+                        <td>
+                            <select onchange="extractedItems[${index}].type = this.value" style="border: 1px solid var(--border); border-radius: 6px; padding: 4px; font-size: 12px;">
+                                <option value="expense" ${item.type === 'expense' ? 'selected' : ''}>Gasto</option>
+                                <option value="income" ${item.type === 'income' ? 'selected' : ''}>Ingreso</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="action-btn delete" onclick="removeExtracted(${index})" title="Quitar">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function removeExtracted(index) {
+            extractedItems.splice(index, 1);
+            showExtractedTransactions();
+        }
+
+        function importAllExtracted() {
+            if (extractedItems.length === 0) return;
+
+            let count = 0;
+            for (const item of extractedItems) {
+                transactions.push({
+                    id: Date.now().toString() + '_' + count,
+                    date: item.date,
+                    amount: item.amount,
+                    description: item.description,
+                    category: item.category,
+                    type: item.type,
+                    payment: 'efectivo',
+                    notes: 'Importado automáticamente',
+                    createdAt: new Date().toISOString()
+                });
+                count++;
+            }
+
+            saveData();
+            resetImportUI();
+            updateDashboard();
+            renderTransactions();
+            showToast(`${count} transacciones importadas correctamente`, 'success');
+            showSection('transactions');
+        }
+
+        function resetImportUI() {
+            document.getElementById('extractedTransactions').style.display = 'none';
+            document.getElementById('extractedTextPreview').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('extractedText').textContent = '';
+            document.getElementById('extractedTableBody').innerHTML = '';
+            extractedItems = [];
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
 
         // ========== IMPORT/EXPORT ==========
