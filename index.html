@@ -996,7 +996,7 @@
                         <div class="form-group">
                             <label>Método de Pago</label>
                             <select id="transPayment">
-                                <option value="efectivo">Efectivo</option>
+                                <option value="efectivo" selected>Efectivo</option>
                                 <option value="tarjeta">Tarjeta</option>
                                 <option value="transferencia">Transferencia</option>
                                 <option value="domiciliación">Domiciliación</option>
@@ -1238,7 +1238,7 @@
                 <div class="form-group">
                     <label>Método de pago</label>
                     <select id="libraryPayment">
-                        <option value="efectivo">Efectivo</option>
+                        <option value="efectivo" selected>Efectivo</option>
                         <option value="tarjeta">Tarjeta</option>
                         <option value="transferencia">Transferencia</option>
                         <option value="domiciliación">Domiciliación</option>
@@ -1963,7 +1963,7 @@
             document.getElementById('libraryName').value = '';
             document.getElementById('libraryAmount').value = '';
             document.getElementById('libraryDescription').value = '';
-            document.getElementById('libraryPayment').value = 'tarjeta';
+            document.getElementById('libraryPayment').value = 'efectivo';
             document.getElementById('libraryModal').classList.add('active');
         }
 
@@ -2008,7 +2008,7 @@
             document.getElementById('libraryCategory').value = item.category;
             document.getElementById('libraryAmount').value = item.amount || '';
             document.getElementById('libraryDescription').value = item.description || '';
-            document.getElementById('libraryPayment').value = item.payment || 'tarjeta';
+            document.getElementById('libraryPayment').value = item.payment || 'efectivo';
             document.getElementById('libraryModal').classList.add('active');
         }
 
@@ -2030,7 +2030,7 @@
             document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('transDescription').value = item.description || item.name;
             document.getElementById('transCategory').value = item.category;
-            document.getElementById('transPayment').value = item.payment || 'tarjeta';
+            document.getElementById('transPayment').value = item.payment || 'efectivo';
             if (item.amount) {
                 document.getElementById('transAmount').value = item.amount;
             }
