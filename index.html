@@ -759,6 +759,14 @@
                 <i class="fas fa-chart-bar"></i>
                 Reportes
             </div>
+            <div class="nav-item" data-section="payroll" onclick="showSection('payroll')">
+                <i class="fas fa-file-invoice-dollar"></i>
+                Nóminas
+            </div>
+            <div class="nav-item" data-section="library" onclick="showSection('library')">
+                <i class="fas fa-book"></i>
+                Biblioteca
+            </div>
             <div class="nav-item" onclick="exportData()">
                 <i class="fas fa-download"></i>
                 Exportar Datos
@@ -952,6 +960,14 @@
                     </button>
                 </div>
 
+                <!-- Quick Library Select -->
+                <div id="quickLibrary" style="margin-bottom: 16px; display: none;">
+                    <label style="font-size: 13px; font-weight: 500; color: var(--text-light); margin-bottom: 8px; display: block;">
+                        <i class="fas fa-bolt"></i> Añadir rápido desde Biblioteca:
+                    </label>
+                    <div id="quickLibraryItems" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+
                 <form id="transactionForm" onsubmit="saveTransaction(event)">
                     <input type="hidden" id="editId" value="">
                     
@@ -1071,6 +1087,100 @@
                 </div>
             </div>
         </section>
+
+        <!-- Payroll Section -->
+        <section class="section" id="payroll">
+            <div class="header">
+                <div>
+                    <h2>Nóminas</h2>
+                    <p style="color: var(--text-light); margin-top: 4px;">Registra tu salario mensual rápidamente</p>
+                </div>
+            </div>
+
+            <div class="card" style="max-width: 640px;">
+                <div class="card-header">
+                    <h3>Añadir Nómina</h3>
+                </div>
+                <form onsubmit="savePayroll(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Mes</label>
+                            <input type="month" id="payrollMonth" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bruto (€)</label>
+                            <input type="number" id="payrollGross" step="0.01" min="0" placeholder="2500.00" required>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Neto (lo que cobras) (€)</label>
+                            <input type="number" id="payrollNet" step="0.01" min="0" placeholder="1800.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Empresa</label>
+                            <input type="text" id="payrollCompany" placeholder="Nombre de la empresa">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notas (opcional)</label>
+                        <textarea id="payrollNotes" rows="2" placeholder="Extras, bonus, pagas extra..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Guardar Nómina
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Historial de Nóminas</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mes</th>
+                            <th>Empresa</th>
+                            <th>Bruto</th>
+                            <th>Neto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payrollHistory">
+                    </tbody>
+                </table>
+                <div class="empty-state" id="emptyPayroll" style="display: none;">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <h4>Sin nóminas registradas</h4>
+                    <p>Añade tu primera nómina arriba</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Library Section -->
+        <section class="section" id="library">
+            <div class="header">
+                <div>
+                    <h2>Biblioteca de Gastos</h2>
+                    <p style="color: var(--text-light); margin-top: 4px;">Guarda tus gastos frecuentes para añadirlos rápido</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openLibraryModal()">
+                        <i class="fas fa-plus"></i> Nuevo Gasto Frecuente
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div id="libraryList"></div>
+                <div class="empty-state" id="emptyLibrary" style="display: none;">
+                    <i class="fas fa-book-open"></i>
+                    <h4>Tu biblioteca está vacía</h4>
+                    <p>Guarda gastos que repites para añadirlos con un solo clic</p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Budget Modal -->
@@ -1092,6 +1202,50 @@
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">
                     <i class="fas fa-save"></i> Guardar Presupuesto
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Library Modal -->
+    <div class="modal-overlay" id="libraryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Nuevo Gasto Frecuente</h3>
+                <button class="modal-close" onclick="closeLibraryModal()">&times;</button>
+            </div>
+            <form onsubmit="saveLibraryItem(event)">
+                <input type="hidden" id="libraryEditId" value="">
+                <div class="form-group">
+                    <label>Nombre del gasto</label>
+                    <input type="text" id="libraryName" placeholder="Ej: Mercadona semanal" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="libraryCategory" required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto habitual (€) - opcional</label>
+                        <input type="number" id="libraryAmount" step="0.01" min="0" placeholder="85.00">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descripción por defecto</label>
+                    <input type="text" id="libraryDescription" placeholder="Compra semanal supermercado">
+                </div>
+                <div class="form-group">
+                    <label>Método de pago</label>
+                    <select id="libraryPayment">
+                        <option value="efectivo">Efectivo</option>
+                        <option value="tarjeta">Tarjeta</option>
+                        <option value="transferencia">Transferencia</option>
+                        <option value="domiciliación">Domiciliación</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-save"></i> Guardar en Biblioteca
                 </button>
             </form>
         </div>
@@ -1134,6 +1288,8 @@
 
         let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
         let budgets = JSON.parse(localStorage.getItem('budgets')) || [];
+        let payrolls = JSON.parse(localStorage.getItem('payrolls')) || [];
+        let library = JSON.parse(localStorage.getItem('library')) || [];
         let currentPeriod = 'month';
         let currentType = 'expense';
         let categoryChart = null;
@@ -1149,10 +1305,14 @@
             
             populateCategories();
             populateFilterCategories();
+            populateLibraryCategories();
             populateReportYears();
             updateDashboard();
             renderTransactions();
             renderBudgets();
+            renderPayrolls();
+            renderLibrary();
+            renderQuickLibrary();
         });
 
         // ========== NAVIGATION ==========
@@ -1683,9 +1843,269 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        // ========== PAYROLL ==========
+        function savePayroll(event) {
+            event.preventDefault();
+            
+            const month = document.getElementById('payrollMonth').value;
+            const existingIndex = payrolls.findIndex(p => p.month === month);
+            
+            const payroll = {
+                id: existingIndex !== -1 ? payrolls[existingIndex].id : Date.now().toString(),
+                month: month,
+                gross: parseFloat(document.getElementById('payrollGross').value),
+                net: parseFloat(document.getElementById('payrollNet').value),
+                company: document.getElementById('payrollCompany').value,
+                notes: document.getElementById('payrollNotes').value
+            };
+            
+            if (existingIndex !== -1) {
+                payrolls[existingIndex] = payroll;
+            } else {
+                payrolls.push(payroll);
+            }
+            
+            localStorage.setItem('payrolls', JSON.stringify(payrolls));
+            
+            // Also create an income transaction for the net amount
+            const existingTrans = transactions.find(t => 
+                t.type === 'income' && t.category === 'salario' && t.date.startsWith(month)
+            );
+            
+            if (!existingTrans) {
+                transactions.push({
+                    id: Date.now().toString() + '_payroll',
+                    date: month + '-01',
+                    amount: payroll.net,
+                    description: `Nómina ${payroll.company || ''} - ${formatMonth(month)}`.trim(),
+                    category: 'salario',
+                    type: 'income',
+                    payment: 'transferencia',
+                    notes: payroll.notes,
+                    createdAt: new Date().toISOString()
+                });
+                saveData();
+            }
+            
+            document.getElementById('payrollMonth').value = '';
+            document.getElementById('payrollGross').value = '';
+            document.getElementById('payrollNet').value = '';
+            document.getElementById('payrollCompany').value = '';
+            document.getElementById('payrollNotes').value = '';
+            
+            renderPayrolls();
+            updateDashboard();
+            showToast('Nómina guardada y registrada como ingreso', 'success');
+        }
+
+        function deletePayroll(id) {
+            const payroll = payrolls.find(p => p.id === id);
+            if (!confirm('¿Eliminar esta nómina? También se eliminará el ingreso asociado.')) return;
+            
+            // Remove associated transaction
+            transactions = transactions.filter(t => 
+                !(t.type === 'income' && t.category === 'salario' && payroll && t.date.startsWith(payroll.month))
+            );
+            
+            payrolls = payrolls.filter(p => p.id !== id);
+            localStorage.setItem('payrolls', JSON.stringify(payrolls));
+            saveData();
+            renderPayrolls();
+            updateDashboard();
+            showToast('Nómina eliminada', 'success');
+        }
+
+        function renderPayrolls() {
+            const tbody = document.getElementById('payrollHistory');
+            const empty = document.getElementById('emptyPayroll');
+            
+            if (payrolls.length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            const sorted = [...payrolls].sort((a, b) => b.month.localeCompare(a.month));
+            
+            tbody.innerHTML = sorted.map(p => `
+                <tr>
+                    <td>${formatMonth(p.month)}</td>
+                    <td>${p.company || '-'}</td>
+                    <td>€${p.gross.toFixed(2)}</td>
+                    <td style="color: var(--success); font-weight: 600;">€${p.net.toFixed(2)}</td>
+                    <td>
+                        <button class="action-btn delete" onclick="deletePayroll('${p.id}')" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function formatMonth(monthStr) {
+            const [year, month] = monthStr.split('-');
+            const date = new Date(year, month - 1);
+            return date.toLocaleDateString('es', { month: 'long', year: 'numeric' });
+        }
+
+        // ========== LIBRARY ==========
+        function populateLibraryCategories() {
+            const select = document.getElementById('libraryCategory');
+            select.innerHTML = EXPENSE_CATEGORIES.map(c =>
+                `<option value="${c.id}">${c.icon} ${c.name}</option>`
+            ).join('');
+        }
+
+        function openLibraryModal() {
+            populateLibraryCategories();
+            document.getElementById('libraryEditId').value = '';
+            document.getElementById('libraryName').value = '';
+            document.getElementById('libraryAmount').value = '';
+            document.getElementById('libraryDescription').value = '';
+            document.getElementById('libraryPayment').value = 'tarjeta';
+            document.getElementById('libraryModal').classList.add('active');
+        }
+
+        function closeLibraryModal() {
+            document.getElementById('libraryModal').classList.remove('active');
+        }
+
+        function saveLibraryItem(event) {
+            event.preventDefault();
+            
+            const editId = document.getElementById('libraryEditId').value;
+            const item = {
+                id: editId || Date.now().toString(),
+                name: document.getElementById('libraryName').value,
+                category: document.getElementById('libraryCategory').value,
+                amount: document.getElementById('libraryAmount').value ? parseFloat(document.getElementById('libraryAmount').value) : null,
+                description: document.getElementById('libraryDescription').value,
+                payment: document.getElementById('libraryPayment').value
+            };
+            
+            if (editId) {
+                const index = library.findIndex(l => l.id === editId);
+                if (index !== -1) library[index] = item;
+            } else {
+                library.push(item);
+            }
+            
+            localStorage.setItem('library', JSON.stringify(library));
+            closeLibraryModal();
+            renderLibrary();
+            renderQuickLibrary();
+            showToast(editId ? 'Gasto actualizado' : 'Gasto añadido a la biblioteca', 'success');
+        }
+
+        function editLibraryItem(id) {
+            const item = library.find(l => l.id === id);
+            if (!item) return;
+            
+            populateLibraryCategories();
+            document.getElementById('libraryEditId').value = item.id;
+            document.getElementById('libraryName').value = item.name;
+            document.getElementById('libraryCategory').value = item.category;
+            document.getElementById('libraryAmount').value = item.amount || '';
+            document.getElementById('libraryDescription').value = item.description || '';
+            document.getElementById('libraryPayment').value = item.payment || 'tarjeta';
+            document.getElementById('libraryModal').classList.add('active');
+        }
+
+        function deleteLibraryItem(id) {
+            if (!confirm('¿Eliminar este gasto de la biblioteca?')) return;
+            library = library.filter(l => l.id !== id);
+            localStorage.setItem('library', JSON.stringify(library));
+            renderLibrary();
+            renderQuickLibrary();
+            showToast('Gasto eliminado de la biblioteca', 'success');
+        }
+
+        function quickAddFromLibrary(id) {
+            const item = library.find(l => l.id === id);
+            if (!item) return;
+            
+            // Fill the form with library data
+            setTransactionType('expense');
+            document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('transDescription').value = item.description || item.name;
+            document.getElementById('transCategory').value = item.category;
+            document.getElementById('transPayment').value = item.payment || 'tarjeta';
+            if (item.amount) {
+                document.getElementById('transAmount').value = item.amount;
+            }
+            document.getElementById('transNotes').value = '';
+            
+            showToast(`${item.name} - completa el monto y guarda`, 'success');
+            
+            // Scroll to the form
+            document.getElementById('transAmount').focus();
+        }
+
+        function renderLibrary() {
+            const container = document.getElementById('libraryList');
+            const empty = document.getElementById('emptyLibrary');
+            
+            if (library.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            
+            container.innerHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">' +
+                library.map(item => {
+                    const cat = getCategoryInfo(item.category);
+                    return `
+                        <div style="border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: var(--bg);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                <div>
+                                    <div style="font-weight: 600; font-size: 15px;">${item.name}</div>
+                                    <span class="category-tag" style="margin-top: 4px;">${cat.icon} ${cat.name}</span>
+                                </div>
+                                <div class="action-btns">
+                                    <button class="action-btn edit" onclick="editLibraryItem('${item.id}')" title="Editar">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deleteLibraryItem('${item.id}')" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            ${item.amount ? `<div style="font-size: 18px; font-weight: 700; color: var(--danger);">€${item.amount.toFixed(2)}</div>` : '<div style="font-size: 12px; color: var(--text-light);">Sin monto fijo</div>'}
+                            ${item.description ? `<div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">${item.description}</div>` : ''}
+                            <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: 12px;" onclick="quickAddFromLibrary('${item.id}')">
+                                <i class="fas fa-bolt"></i> Añadir ahora
+                            </button>
+                        </div>
+                    `;
+                }).join('') + '</div>';
+        }
+
+        function renderQuickLibrary() {
+            const container = document.getElementById('quickLibraryItems');
+            const wrapper = document.getElementById('quickLibrary');
+            
+            if (library.length === 0) {
+                wrapper.style.display = 'none';
+                return;
+            }
+            
+            wrapper.style.display = 'block';
+            container.innerHTML = library.map(item => {
+                const cat = getCategoryInfo(item.category);
+                return `
+                    <button class="btn btn-outline btn-sm" onclick="quickAddFromLibrary('${item.id}')" style="border-radius: 20px;">
+                        ${cat.icon} ${item.name}${item.amount ? ` (€${item.amount.toFixed(2)})` : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+
         // ========== IMPORT/EXPORT ==========
         function exportData() {
-            const data = { transactions, budgets, exportDate: new Date().toISOString() };
+            const data = { transactions, budgets, payrolls, library, exportDate: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1712,9 +2132,20 @@
                         budgets = data.budgets;
                         localStorage.setItem('budgets', JSON.stringify(budgets));
                     }
+                    if (data.payrolls) {
+                        payrolls = data.payrolls;
+                        localStorage.setItem('payrolls', JSON.stringify(payrolls));
+                    }
+                    if (data.library) {
+                        library = data.library;
+                        localStorage.setItem('library', JSON.stringify(library));
+                    }
                     updateDashboard();
                     renderTransactions();
                     renderBudgets();
+                    renderPayrolls();
+                    renderLibrary();
+                    renderQuickLibrary();
                     populateReportYears();
                     showToast('Datos importados correctamente');
                 } catch (err) {
