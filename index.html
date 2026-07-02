@@ -532,6 +532,23 @@
             transition: width 0.3s;
         }
 
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -546,10 +563,15 @@
             .main {
                 margin-left: 0;
                 padding: 16px;
+                padding-top: 70px;
             }
 
             .mobile-toggle {
-                display: block !important;
+                display: flex !important;
+            }
+
+            .header {
+                margin-top: 24px;
             }
 
             .stats-grid {
@@ -575,6 +597,9 @@
             border: none;
             font-size: 20px;
             cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
         }
 
         /* Animations */
@@ -695,6 +720,9 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
     <!-- Mobile Toggle -->
     <button class="mobile-toggle" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
@@ -1129,6 +1157,7 @@
 
         // ========== NAVIGATION ==========
         function showSection(sectionId) {
+            closeSidebar();
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
@@ -1140,7 +1169,17 @@
         }
 
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
         }
 
         // ========== CATEGORIES ==========
