@@ -802,7 +802,7 @@
             box-shadow: var(--shadow);
         }
 
-        /* ===== SPLASH / PORTADA ===== */
+        /* ===== SPLASH / PORTADA ISOMÉTRICA ===== */
         #splash {
             position: fixed;
             inset: 0;
@@ -810,8 +810,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            justify-content: flex-start;
+            background: #FACC15;
             overflow: hidden;
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
@@ -822,125 +822,117 @@
             pointer-events: none;
         }
 
-        /* Partículas de fondo */
-        .splash-particles {
+        /* Blob naranja de fondo */
+        .splash-blob {
             position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
+            width: 120%;
+            height: 70%;
+            top: -10%;
+            left: -10%;
+            background: linear-gradient(160deg, #FB923C 0%, #F97316 40%, #EA580C 100%);
+            border-radius: 0 0 50% 50%;
+            z-index: 0;
         }
 
-        .splash-particles span {
+        .splash-blob-2 {
             position: absolute;
-            width: 6px;
-            height: 6px;
-            background: rgba(165, 180, 252, 0.4);
-            border-radius: 50%;
-            animation: floatUp linear infinite;
+            width: 80%;
+            height: 40%;
+            bottom: 5%;
+            right: -20%;
+            background: rgba(250, 204, 21, 0.3);
+            border-radius: 50% 0 0 50%;
+            z-index: 0;
         }
 
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            20% { opacity: 1; }
-            80% { opacity: 0.6; }
-            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
-        }
-
-        /* Glow orbs */
-        .splash-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.35;
-            animation: orbPulse 6s ease-in-out infinite alternate;
-        }
-
-        .splash-orb-1 {
-            width: 300px; height: 300px;
-            background: #6366f1;
-            top: 10%; left: -5%;
-        }
-
-        .splash-orb-2 {
-            width: 250px; height: 250px;
-            background: #a78bfa;
-            bottom: 10%; right: -5%;
-            animation-delay: 3s;
-        }
-
-        .splash-orb-3 {
-            width: 200px; height: 200px;
-            background: #34d399;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: 1.5s;
-        }
-
-        @keyframes orbPulse {
-            0% { transform: scale(1); opacity: 0.25; }
-            100% { transform: scale(1.3); opacity: 0.45; }
-        }
-
-        /* Contenido central */
-        .splash-content {
+        /* Contenido */
+        .splash-wrap {
             position: relative;
             z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 420px;
+            padding: 0 20px;
             text-align: center;
-            padding: 0 24px;
-            max-width: 400px;
         }
 
-        .splash-logo {
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(135deg, #6366f1, #a78bfa);
-            border-radius: 24px;
+        /* Header */
+        .splash-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 48px;
+            margin-bottom: 20px;
+            animation: slideUp 0.6s ease-out both;
+        }
+
+        .splash-brand-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 40px;
+            font-size: 22px;
             color: white;
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.5);
-            animation: logoAppear 1s ease-out;
+            backdrop-filter: blur(10px);
         }
 
-        @keyframes logoAppear {
-            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-            60% { transform: scale(1.1) rotate(10deg); }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-
-        .splash-title {
-            font-size: 32px;
+        .splash-brand-text {
+            font-size: 20px;
             font-weight: 700;
             color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Illustration SVG */
+        .splash-illustration {
+            width: 100%;
+            max-width: 340px;
+            margin: 10px 0 24px;
+            animation: floatIn 1s ease-out 0.2s both;
+        }
+
+        @keyframes floatIn {
+            0% { transform: translateY(40px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* Título y subtítulo */
+        .splash-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: #1E293B;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
-            animation: slideUp 0.8s ease-out 0.3s both;
+            animation: slideUp 0.7s ease-out 0.4s both;
         }
 
         .splash-subtitle {
             font-size: 15px;
-            color: #a5b4fc;
-            margin-bottom: 40px;
+            color: #475569;
+            margin-bottom: 32px;
             line-height: 1.5;
-            animation: slideUp 0.8s ease-out 0.5s both;
+            animation: slideUp 0.7s ease-out 0.55s both;
+            max-width: 300px;
         }
 
         @keyframes slideUp {
-            0% { transform: translateY(30px); opacity: 0; }
+            0% { transform: translateY(25px); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
         }
 
-        /* Features pills */
+        /* Features */
         .splash-features {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
-            margin-bottom: 40px;
-            animation: slideUp 0.8s ease-out 0.7s both;
+            margin-bottom: 32px;
+            animation: slideUp 0.7s ease-out 0.7s both;
         }
 
         .splash-feature {
@@ -948,176 +940,219 @@
             align-items: center;
             gap: 6px;
             padding: 8px 14px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.7);
+            border: 1px solid rgba(0,0,0,0.06);
             border-radius: 30px;
-            color: #c7d2fe;
+            color: #1E293B;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             backdrop-filter: blur(10px);
         }
 
         .splash-feature i {
-            color: #a78bfa;
             font-size: 13px;
         }
+
+        .feat-green i { color: #10B981; }
+        .feat-blue i { color: #3B82F6; }
+        .feat-purple i { color: #8B5CF6; }
+        .feat-orange i { color: #F97316; }
 
         /* Botón CTA */
         .splash-cta {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
+            padding: 16px 48px;
+            background: #1E293B;
+            color: #FACC15;
             border: none;
             border-radius: 16px;
             font-family: 'Inter', sans-serif;
             font-size: 17px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.5);
-            animation: slideUp 0.8s ease-out 0.9s both;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .splash-cta::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
-            transform: rotate(45deg);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
+            box-shadow: 0 10px 30px rgba(30, 41, 59, 0.35);
+            animation: slideUp 0.7s ease-out 0.85s both;
         }
 
         .splash-cta:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 15px 50px rgba(99, 102, 241, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 40px rgba(30, 41, 59, 0.45);
         }
 
         .splash-cta:active {
-            transform: translateY(0) scale(0.98);
+            transform: translateY(0) scale(0.97);
         }
 
-        /* Mockup flotante */
-        .splash-mockup {
-            position: absolute;
-            width: 220px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 16px;
-            backdrop-filter: blur(20px);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .splash-mockup-left {
-            left: 5%;
-            top: 20%;
-            animation-delay: 0s;
-        }
-
-        .splash-mockup-right {
-            right: 5%;
-            bottom: 20%;
-            animation-delay: 3s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-        }
-
-        .mockup-bar {
-            height: 8px;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            opacity: 0.5;
-        }
-
-        /* Versión */
-        .splash-version {
+        /* Footer */
+        .splash-footer {
             position: absolute;
             bottom: 20px;
-            color: rgba(165, 180, 252, 0.3);
-            font-size: 11px;
             z-index: 2;
+            font-size: 11px;
+            color: rgba(30, 41, 59, 0.35);
+            font-weight: 500;
         }
 
-        /* Responsive splash */
+        /* Responsive */
         @media (max-width: 480px) {
-            .splash-mockup { display: none; }
-            .splash-title { font-size: 26px; }
-            .splash-subtitle { font-size: 14px; }
-            .splash-logo { width: 72px; height: 72px; font-size: 32px; border-radius: 20px; }
+            .splash-brand { margin-top: 32px; }
+            .splash-illustration { max-width: 280px; }
+            .splash-title { font-size: 24px; }
+            .splash-subtitle { font-size: 13px; }
+        }
+
+        @media (min-width: 768px) {
+            .splash-wrap { max-width: 480px; }
+            .splash-illustration { max-width: 380px; }
         }
     </style>
 </head>
 <body>
-    <!-- ===== PORTADA / SPLASH SCREEN ===== -->
+    <!-- ===== PORTADA / SPLASH ISOMÉTRICA ===== -->
     <div id="splash">
-        <div class="splash-orb splash-orb-1"></div>
-        <div class="splash-orb splash-orb-2"></div>
-        <div class="splash-orb splash-orb-3"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob-2"></div>
 
-        <div class="splash-particles" id="splashParticles"></div>
-
-        <!-- Mockup izquierda -->
-        <div class="splash-mockup splash-mockup-left">
-            <div class="mockup-bar" style="background:#a78bfa; width:60%;"></div>
-            <div class="mockup-bar" style="background:#818cf8; width:80%;"></div>
-            <div class="mockup-bar" style="background:#6366f1; width:45%;"></div>
-            <div class="mockup-bar" style="background:#4f46e5; width:70%;"></div>
-            <div style="display:flex; gap:8px; margin-top:12px;">
-                <div style="flex:1; height:40px; background:rgba(99,102,241,0.2); border-radius:8px;"></div>
-                <div style="flex:1; height:40px; background:rgba(16,185,129,0.2); border-radius:8px;"></div>
+        <div class="splash-wrap">
+            <!-- Brand -->
+            <div class="splash-brand">
+                <div class="splash-brand-icon"><i class="fas fa-wallet"></i></div>
+                <span class="splash-brand-text">HogarContable</span>
             </div>
-        </div>
 
-        <!-- Mockup derecha -->
-        <div class="splash-mockup splash-mockup-right">
-            <div style="display:flex; gap:6px; margin-bottom:12px;">
-                <div style="flex:1; height:50px; background:rgba(16,185,129,0.15); border-radius:10px;"></div>
-                <div style="flex:1; height:50px; background:rgba(239,68,68,0.15); border-radius:10px;"></div>
-            </div>
-            <div class="mockup-bar" style="background:#34d399; width:100%;"></div>
-            <div class="mockup-bar" style="background:#f59e0b; width:65%;"></div>
-        </div>
+            <!-- Ilustración isométrica SVG -->
+            <svg class="splash-illustration" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Suelo/superficie -->
+                <path d="M200 270 L350 190 L200 230 L50 190 Z" fill="#FDE68A" opacity="0.5"/>
 
-        <!-- Contenido central -->
-        <div class="splash-content">
-            <div class="splash-logo">
-                <i class="fas fa-wallet"></i>
-            </div>
-            <h1 class="splash-title">HogarContable</h1>
+                <!-- Pila de billetes (izquierda) -->
+                <g transform="translate(40, 120)">
+                    <!-- Billete base -->
+                    <path d="M0 80 L100 40 L180 70 L80 110 Z" fill="#0D9488"/>
+                    <path d="M0 80 L0 60 L100 20 L100 40 Z" fill="#0F766E"/>
+                    <path d="M100 40 L180 70 L180 50 L100 20 Z" fill="#115E59"/>
+                    <!-- Billete medio -->
+                    <path d="M10 65 L110 25 L190 55 L90 95 Z" fill="#14B8A6"/>
+                    <path d="M10 65 L10 45 L110 5 L110 25 Z" fill="#0D9488"/>
+                    <path d="M110 25 L190 55 L190 35 L110 5 Z" fill="#0F766E"/>
+                    <!-- Billete superior -->
+                    <path d="M20 50 L120 10 L200 40 L100 80 Z" fill="#2DD4BF"/>
+                    <path d="M20 50 L20 30 L120 -10 L120 10 Z" fill="#14B8A6"/>
+                    <path d="M120 10 L200 40 L200 20 L120 -10 Z" fill="#0D9488"/>
+                    <!-- Símbolo € -->
+                    <text x="95" y="48" font-family="Inter,sans-serif" font-size="22" font-weight="800" fill="white" opacity="0.9">€</text>
+                </g>
+
+                <!-- Calculadora (centro) -->
+                <g transform="translate(130, 80)">
+                    <!-- Cuerpo -->
+                    <path d="M0 100 L90 55 L180 90 L90 135 Z" fill="#1E293B"/>
+                    <path d="M0 100 L0 70 L90 25 L90 55 Z" fill="#334155"/>
+                    <path d="M90 55 L180 90 L180 60 L90 25 Z" fill="#0F172A"/>
+                    <!-- Pantalla -->
+                    <path d="M15 85 L75 58 L135 78 L75 105 Z" fill="#38BDF8" opacity="0.3"/>
+                    <path d="M20 82 L72 59 L125 76 L73 100 Z" fill="#0EA5E9" opacity="0.6"/>
+                    <!-- Teclas -->
+                    <rect x="25" y="72" width="12" height="8" rx="2" fill="#4ADE80" opacity="0.7" transform="skewX(-30) translate(40, -10)"/>
+                    <rect x="45" y="72" width="12" height="8" rx="2" fill="#4ADE80" opacity="0.7" transform="skewX(-30) translate(25, -5)"/>
+                    <rect x="65" y="72" width="12" height="8" rx="2" fill="#F97316" opacity="0.7" transform="skewX(-30) translate(10, 0)"/>
+                    <rect x="25" y="85" width="12" height="8" rx="2" fill="#94A3B8" opacity="0.5" transform="skewX(-30) translate(40, -5)"/>
+                    <rect x="45" y="85" width="12" height="8" rx="2" fill="#94A3B8" opacity="0.5" transform="skewX(-30) translate(25, 0)"/>
+                    <rect x="65" y="85" width="12" height="8" rx="2" fill="#94A3B8" opacity="0.5" transform="skewX(-30) translate(10, 5)"/>
+                </g>
+
+                <!-- Teléfono/Móvil (derecha) -->
+                <g transform="translate(250, 60)">
+                    <!-- Sombra -->
+                    <ellipse cx="50" cy="155" rx="35" ry="8" fill="rgba(0,0,0,0.08)"/>
+                    <!-- Cuerpo -->
+                    <path d="M10 10 L10 130 L60 155 L60 35 Z" fill="#1E293B"/>
+                    <path d="M10 10 L40 0 L90 25 L60 55 Z" fill="#334155"/>
+                    <path d="M60 35 L90 25 L90 145 L60 155 Z" fill="#0F172A"/>
+                    <!-- Pantalla -->
+                    <path d="M16 20 L16 120 L55 140 L55 40 Z" fill="#6366F1"/>
+                    <path d="M16 20 L38 12 L78 30 L55 40 Z" fill="#818CF8"/>
+                    <path d="M55 40 L78 30 L78 130 L55 140 Z" fill="#4F46E5"/>
+                    <!-- Gráfico en pantalla -->
+                    <path d="M22 90 L30 70 L38 80 L46 55 L50 65" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <circle cx="30" cy="70" r="3" fill="#FACC15"/>
+                    <circle cx="38" cy="80" r="3" fill="#FACC15"/>
+                    <circle cx="46" cy="55" r="3" fill="#FACC15"/>
+                    <!-- Barras -->
+                    <rect x="22" y="100" width="6" height="18" rx="1" fill="#4ADE80" opacity="0.8"/>
+                    <rect x="31" y="95" width="6" height="23" rx="1" fill="#4ADE80" opacity="0.8"/>
+                    <rect x="40" y="105" width="6" height="13" rx="1" fill="#F87171" opacity="0.8"/>
+                </g>
+
+                <!-- Monedas flotantes -->
+                <g>
+                    <!-- Moneda 1 -->
+                    <g transform="translate(60, 60)" style="animation: coinFloat 3s ease-in-out infinite">
+                        <ellipse cx="0" cy="0" rx="18" ry="10" fill="#F59E0B"/>
+                        <ellipse cx="0" cy="-4" rx="18" ry="10" fill="#FBBF24"/>
+                        <text x="-6" y="-1" font-family="Inter" font-size="11" font-weight="800" fill="#92400E">€</text>
+                    </g>
+                    <!-- Moneda 2 -->
+                    <g transform="translate(320, 100)" style="animation: coinFloat 4s ease-in-out 1s infinite">
+                        <ellipse cx="0" cy="0" rx="15" ry="8" fill="#F59E0B"/>
+                        <ellipse cx="0" cy="-3" rx="15" ry="8" fill="#FBBF24"/>
+                        <text x="-5" y="-1" font-family="Inter" font-size="9" font-weight="800" fill="#92400E">€</text>
+                    </g>
+                    <!-- Moneda 3 -->
+                    <g transform="translate(180, 30)" style="animation: coinFloat 3.5s ease-in-out 0.5s infinite">
+                        <ellipse cx="0" cy="0" rx="12" ry="7" fill="#F59E0B"/>
+                        <ellipse cx="0" cy="-3" rx="12" ry="7" fill="#FBBF24"/>
+                        <text x="-4" y="0" font-family="Inter" font-size="8" font-weight="800" fill="#92400E">€</text>
+                    </g>
+                </g>
+
+                <!-- Gráfico circular flotante -->
+                <g transform="translate(300, 30)" style="animation: coinFloat 5s ease-in-out 2s infinite">
+                    <circle cx="0" cy="0" r="22" fill="white" opacity="0.9"/>
+                    <path d="M0 0 L0 -18 A18 18 0 0 1 15.6 9 Z" fill="#6366F1"/>
+                    <path d="M0 0 L15.6 9 A18 18 0 0 1 -15.6 9 Z" fill="#10B981"/>
+                    <path d="M0 0 L-15.6 9 A18 18 0 0 1 0 -18 Z" fill="#F59E0B"/>
+                </g>
+
+                <!-- Notas/papeles -->
+                <g transform="translate(10, 170)">
+                    <path d="M0 0 L40 -15 L80 0 L40 15 Z" fill="white" opacity="0.8"/>
+                    <line x1="10" y1="-3" x2="50" y2="-12" stroke="#CBD5E1" stroke-width="2"/>
+                    <line x1="15" y1="2" x2="55" y2="-7" stroke="#CBD5E1" stroke-width="2"/>
+                </g>
+
+                <style>
+                    @keyframes coinFloat {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-8px); }
+                    }
+                </style>
+            </svg>
+
+            <!-- Título -->
+            <h1 class="splash-title">Tu dinero, bajo control</h1>
             <p class="splash-subtitle">
-                Tu dinero, bajo control.<br>
-                Contabilidad doméstica simple, visual y potente.
+                Contabilidad doméstica simple, visual y potente. Diseñada para tu día a día.
             </p>
 
+            <!-- Features -->
             <div class="splash-features">
-                <span class="splash-feature"><i class="fas fa-chart-pie"></i> Gráficos</span>
-                <span class="splash-feature"><i class="fas fa-tags"></i> Categorías</span>
-                <span class="splash-feature"><i class="fas fa-file-pdf"></i> Nóminas PDF</span>
-                <span class="splash-feature"><i class="fas fa-mobile-alt"></i> Móvil</span>
+                <span class="splash-feature feat-green"><i class="fas fa-chart-pie"></i> Gráficos</span>
+                <span class="splash-feature feat-blue"><i class="fas fa-tags"></i> Categorías</span>
+                <span class="splash-feature feat-purple"><i class="fas fa-file-pdf"></i> Nóminas PDF</span>
+                <span class="splash-feature feat-orange"><i class="fas fa-mobile-alt"></i> Móvil</span>
             </div>
 
+            <!-- CTA -->
             <button class="splash-cta" onclick="enterApp()">
                 Comenzar <i class="fas fa-arrow-right"></i>
             </button>
         </div>
 
-        <span class="splash-version">v2.0 — HogarContable</span>
+        <span class="splash-footer">HogarContable v2.0</span>
     </div>
 
     <!-- Sidebar Overlay -->
@@ -3061,19 +3096,6 @@
 
         // ===== SPLASH SCREEN =====
         (function() {
-            // Generar partículas
-            const container = document.getElementById('splashParticles');
-            if (container) {
-                for (let i = 0; i < 30; i++) {
-                    const p = document.createElement('span');
-                    p.style.left = Math.random() * 100 + '%';
-                    p.style.animationDuration = (4 + Math.random() * 6) + 's';
-                    p.style.animationDelay = Math.random() * 5 + 's';
-                    p.style.width = p.style.height = (3 + Math.random() * 5) + 'px';
-                    container.appendChild(p);
-                }
-            }
-
             // Si ya visitó hoy, saltar splash
             const lastVisit = sessionStorage.getItem('hc_splash_seen');
             if (lastVisit) {
