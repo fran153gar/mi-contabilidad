@@ -801,9 +801,325 @@
             color: var(--text);
             box-shadow: var(--shadow);
         }
+
+        /* ===== SPLASH / PORTADA ===== */
+        #splash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            overflow: hidden;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        #splash.hide {
+            opacity: 0;
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+
+        /* Partículas de fondo */
+        .splash-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .splash-particles span {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(165, 180, 252, 0.4);
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Glow orbs */
+        .splash-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+            animation: orbPulse 6s ease-in-out infinite alternate;
+        }
+
+        .splash-orb-1 {
+            width: 300px; height: 300px;
+            background: #6366f1;
+            top: 10%; left: -5%;
+        }
+
+        .splash-orb-2 {
+            width: 250px; height: 250px;
+            background: #a78bfa;
+            bottom: 10%; right: -5%;
+            animation-delay: 3s;
+        }
+
+        .splash-orb-3 {
+            width: 200px; height: 200px;
+            background: #34d399;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 1.5s;
+        }
+
+        @keyframes orbPulse {
+            0% { transform: scale(1); opacity: 0.25; }
+            100% { transform: scale(1.3); opacity: 0.45; }
+        }
+
+        /* Contenido central */
+        .splash-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 0 24px;
+            max-width: 400px;
+        }
+
+        .splash-logo {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.5);
+            animation: logoAppear 1s ease-out;
+        }
+
+        @keyframes logoAppear {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            60% { transform: scale(1.1) rotate(10deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .splash-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            animation: slideUp 0.8s ease-out 0.3s both;
+        }
+
+        .splash-subtitle {
+            font-size: 15px;
+            color: #a5b4fc;
+            margin-bottom: 40px;
+            line-height: 1.5;
+            animation: slideUp 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes slideUp {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Features pills */
+        .splash-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: slideUp 0.8s ease-out 0.7s both;
+        }
+
+        .splash-feature {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 30px;
+            color: #c7d2fe;
+            font-size: 12px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .splash-feature i {
+            color: #a78bfa;
+            font-size: 13px;
+        }
+
+        /* Botón CTA */
+        .splash-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.5);
+            animation: slideUp 0.8s ease-out 0.9s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .splash-cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .splash-cta:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 15px 50px rgba(99, 102, 241, 0.6);
+        }
+
+        .splash-cta:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Mockup flotante */
+        .splash-mockup {
+            position: absolute;
+            width: 220px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(20px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .splash-mockup-left {
+            left: 5%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .splash-mockup-right {
+            right: 5%;
+            bottom: 20%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .mockup-bar {
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        /* Versión */
+        .splash-version {
+            position: absolute;
+            bottom: 20px;
+            color: rgba(165, 180, 252, 0.3);
+            font-size: 11px;
+            z-index: 2;
+        }
+
+        /* Responsive splash */
+        @media (max-width: 480px) {
+            .splash-mockup { display: none; }
+            .splash-title { font-size: 26px; }
+            .splash-subtitle { font-size: 14px; }
+            .splash-logo { width: 72px; height: 72px; font-size: 32px; border-radius: 20px; }
+        }
     </style>
 </head>
 <body>
+    <!-- ===== PORTADA / SPLASH SCREEN ===== -->
+    <div id="splash">
+        <div class="splash-orb splash-orb-1"></div>
+        <div class="splash-orb splash-orb-2"></div>
+        <div class="splash-orb splash-orb-3"></div>
+
+        <div class="splash-particles" id="splashParticles"></div>
+
+        <!-- Mockup izquierda -->
+        <div class="splash-mockup splash-mockup-left">
+            <div class="mockup-bar" style="background:#a78bfa; width:60%;"></div>
+            <div class="mockup-bar" style="background:#818cf8; width:80%;"></div>
+            <div class="mockup-bar" style="background:#6366f1; width:45%;"></div>
+            <div class="mockup-bar" style="background:#4f46e5; width:70%;"></div>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <div style="flex:1; height:40px; background:rgba(99,102,241,0.2); border-radius:8px;"></div>
+                <div style="flex:1; height:40px; background:rgba(16,185,129,0.2); border-radius:8px;"></div>
+            </div>
+        </div>
+
+        <!-- Mockup derecha -->
+        <div class="splash-mockup splash-mockup-right">
+            <div style="display:flex; gap:6px; margin-bottom:12px;">
+                <div style="flex:1; height:50px; background:rgba(16,185,129,0.15); border-radius:10px;"></div>
+                <div style="flex:1; height:50px; background:rgba(239,68,68,0.15); border-radius:10px;"></div>
+            </div>
+            <div class="mockup-bar" style="background:#34d399; width:100%;"></div>
+            <div class="mockup-bar" style="background:#f59e0b; width:65%;"></div>
+        </div>
+
+        <!-- Contenido central -->
+        <div class="splash-content">
+            <div class="splash-logo">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <h1 class="splash-title">HogarContable</h1>
+            <p class="splash-subtitle">
+                Tu dinero, bajo control.<br>
+                Contabilidad doméstica simple, visual y potente.
+            </p>
+
+            <div class="splash-features">
+                <span class="splash-feature"><i class="fas fa-chart-pie"></i> Gráficos</span>
+                <span class="splash-feature"><i class="fas fa-tags"></i> Categorías</span>
+                <span class="splash-feature"><i class="fas fa-file-pdf"></i> Nóminas PDF</span>
+                <span class="splash-feature"><i class="fas fa-mobile-alt"></i> Móvil</span>
+            </div>
+
+            <button class="splash-cta" onclick="enterApp()">
+                Comenzar <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <span class="splash-version">v2.0 — HogarContable</span>
+    </div>
+
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
@@ -2741,6 +3057,35 @@
             };
             reader.readAsText(file);
             event.target.value = '';
+        }
+
+        // ===== SPLASH SCREEN =====
+        (function() {
+            // Generar partículas
+            const container = document.getElementById('splashParticles');
+            if (container) {
+                for (let i = 0; i < 30; i++) {
+                    const p = document.createElement('span');
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.animationDuration = (4 + Math.random() * 6) + 's';
+                    p.style.animationDelay = Math.random() * 5 + 's';
+                    p.style.width = p.style.height = (3 + Math.random() * 5) + 'px';
+                    container.appendChild(p);
+                }
+            }
+
+            // Si ya visitó hoy, saltar splash
+            const lastVisit = sessionStorage.getItem('hc_splash_seen');
+            if (lastVisit) {
+                document.getElementById('splash').style.display = 'none';
+            }
+        })();
+
+        function enterApp() {
+            const splash = document.getElementById('splash');
+            splash.classList.add('hide');
+            sessionStorage.setItem('hc_splash_seen', '1');
+            setTimeout(() => { splash.style.display = 'none'; }, 800);
         }
     </script>
 </body>
