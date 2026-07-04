@@ -584,6 +584,83 @@
             .charts-grid {
                 grid-template-columns: 1fr;
             }
+
+            /* ===== Tabla → Tarjetas en móvil ===== */
+            .card table {
+                display: block;
+            }
+
+            .card table thead {
+                display: none;
+            }
+
+            .card table tbody {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .card table tbody tr {
+                display: flex;
+                flex-direction: column;
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 14px 16px;
+                box-shadow: var(--shadow);
+                position: relative;
+            }
+
+            .card table tbody tr:hover {
+                background: var(--card);
+            }
+
+            .card table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+                border-bottom: 1px solid var(--border);
+                font-size: 13px;
+            }
+
+            .card table tbody td:last-child {
+                border-bottom: none;
+                padding-top: 10px;
+                justify-content: flex-end;
+            }
+
+            .card table tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-light);
+                min-width: 90px;
+            }
+
+            /* Filtros en columna */
+            .filters {
+                flex-direction: column;
+            }
+
+            .filters input,
+            .filters select {
+                width: 100%;
+            }
+
+            /* Header transacciones apilado */
+            #transactions .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            #transactions .header .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         .mobile-toggle {
@@ -1555,12 +1632,12 @@
                     const cat = getCategoryInfo(t.category);
                     return `
                         <tr>
-                            <td>${formatDate(t.date)}</td>
-                            <td><strong>${t.description}</strong></td>
-                            <td><span class="badge ${t.type === 'income' ? 'badge-income' : 'badge-expense'}">${t.type === 'income' ? 'Ingreso' : 'Gasto'}</span></td>
-                            <td><span class="category-tag">${cat.icon} ${cat.name}</span></td>
-                            <td class="amount ${t.type === 'income' ? 'positive' : 'negative'}">${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}</td>
-                            <td>
+                            <td data-label="Fecha">${formatDate(t.date)}</td>
+                            <td data-label="Descripción"><strong>${t.description}</strong></td>
+                            <td data-label="Tipo"><span class="badge ${t.type === 'income' ? 'badge-income' : 'badge-expense'}">${t.type === 'income' ? 'Ingreso' : 'Gasto'}</span></td>
+                            <td data-label="Categoría"><span class="category-tag">${cat.icon} ${cat.name}</span></td>
+                            <td data-label="Monto" class="amount ${t.type === 'income' ? 'positive' : 'negative'}">${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}</td>
+                            <td data-label="Acciones">
                                 <div class="action-btns">
                                     <button class="action-btn edit" onclick="editTransaction('${t.id}')" title="Editar"><i class="fas fa-pen"></i></button>
                                     <button class="action-btn delete" onclick="deleteTransaction('${t.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
@@ -1646,10 +1723,10 @@
                 const cat = getCategoryInfo(t.category);
                 return `
                     <tr>
-                        <td>${formatDate(t.date)}</td>
-                        <td>${t.description}</td>
-                        <td><span class="category-tag">${cat.icon} ${cat.name}</span></td>
-                        <td class="amount ${t.type === 'income' ? 'positive' : 'negative'}">${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}</td>
+                        <td data-label="Fecha">${formatDate(t.date)}</td>
+                        <td data-label="Descripción">${t.description}</td>
+                        <td data-label="Categoría"><span class="category-tag">${cat.icon} ${cat.name}</span></td>
+                        <td data-label="Monto" class="amount ${t.type === 'income' ? 'positive' : 'negative'}">${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}</td>
                     </tr>
                 `;
             }).join('');
